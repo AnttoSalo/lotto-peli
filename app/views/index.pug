@@ -1,0 +1,31 @@
+
+block content
+    .content-wrapper.w-100
+        .black-overlay
+            .content
+                h1.display-4 Lotto-Peli
+
+        .container.mt-8
+            .p Valitse numerosi
+            form(action="/numbers" method="post")
+                label(for="n1") Numero 1:
+                input.form-control(type="number" name="n1")
+                .form-group-mt-6
+                    label(for="n2") Numero 2:
+                    input.form-control(type="number" name="n2")
+                .form-group
+                    label(for="n3") Numero 3:
+                    input.form-control(type="number" name="n3")
+                .form-group.mt-6
+                    label(for="n4") Numero 4:
+                    input.form-control(type="number" name="n4")
+                .form-group
+                    label(for="n5") Numero 5:
+                    input.form-control(type="number" name="n5")
+                .form-group
+                    label(for="n6") Numero 6:
+                    input.form-control(type="number" name="n6")
+                .form-group
+                    label(for="n7") Numero 7:
+                    input.form-control(type="number" name="n7")
+                button.btn.btn-primary(type="submit") Laske

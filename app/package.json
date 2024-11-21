@@ -1,0 +1,38 @@
+{
+  "name": "staffbreak",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --recursive --timeout 10000",
+    "db:wipe": "sequelize db:drop && sequelize db:create && sequelize db:migrate",
+    "db:reset": "sequelize db:drop && sequelize db:create && sequelize db:migrate && sequelize db:seed:all"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@faker-js/faker": "^9.0.1",
+    "@popperjs/core": "^2.11.8",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "bootstrap": "^4.5.2",
+    "connect-flash": "^0.1.1",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "faker": "^6.6.6",
+    "jquery": "^3.7.1",
+    "mysql2": "^3.10.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "pug": "^3.0.3",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3",
+    "sinon": "^19.0.2",
+    "supertest": "^7.0.0"
+  }
+}
