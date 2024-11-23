@@ -116,14 +116,24 @@ primary_nums_elements = WebDriverWait(driver, 10).until(
 secondary_nums_elements = WebDriverWait(driver, 10).until(
     EC.presence_of_all_elements_located((By.CLASS_NAME, "lotto-correct-secondary-numbers"))
 )
+# Locate the h3 element
+date_rows = WebDriverWait(driver, 10).until(
+    EC.presence_of_all_elements_located((By.XPATH, "//h3[contains(@class, 'date-row')]//span[@class='pull-right']"))
+)
 
+lotto_nums = []
 # Ensure both lists have the same length
 if len(primary_nums_elements) != len(secondary_nums_elements):
     print("Warning: Mismatch between primary and secondary numbers!")
 else:
-    print("Lotto Results:")
     for i, (primary, secondary) in enumerate(zip(primary_nums_elements, secondary_nums_elements), start=1):
-        print(f"Result {i}:")
-        print(f"  Primary Numbers: {primary.text}")
-        print(f"  Secondary Number: {secondary.text}")
+        arr = primary.text.split("\n")
+        arr.append(secondary.text)
+        lotto_nums.append(arr)
 
+with open('results.txt', 'w') as file:
+    file.write("Lotto Results:\n")
+    for arr in lotto_nums:
+        file.write(f"Result {i}:\n")
+        file.write(f"  Primary Numbers: {arr[0]}\n")
+        file.write(f"  Secondary Number: {arr[1]}\n")
