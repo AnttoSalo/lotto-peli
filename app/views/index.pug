@@ -1,31 +1,77 @@
-
 block content
-    .content-wrapper.w-100
+    .content-wrapper.w-50
         .black-overlay
             .content
                 h1.display-4 Lotto-Peli
 
         .container.mt-8
             .p Valitse numerosi
-            form(action="/numbers" method="post")
-                label(for="n1") Numero 1:
-                input.form-control(type="number" name="n1")
-                .form-group-mt-6
-                    label(for="n2") Numero 2:
-                    input.form-control(type="number" name="n2")
-                .form-group
-                    label(for="n3") Numero 3:
-                    input.form-control(type="number" name="n3")
-                .form-group.mt-6
-                    label(for="n4") Numero 4:
-                    input.form-control(type="number" name="n4")
-                .form-group
-                    label(for="n5") Numero 5:
-                    input.form-control(type="number" name="n5")
-                .form-group
-                    label(for="n6") Numero 6:
-                    input.form-control(type="number" name="n6")
-                .form-group
-                    label(for="n7") Numero 7:
-                    input.form-control(type="number" name="n7")
-                button.btn.btn-primary(type="submit") Laske
+            form(action="/check-numbers" method="post")
+                .number-grid
+                    each num in [...Array(39).keys()].map(n => n + 1)
+                        .number-box
+                            input(type="checkbox" id=`num${num}` name="numbers" value=`${num}` onchange="limitSelection(this)")
+                            label(for=`num${num}`) #{num}
+                button.btn.btn-primary.mt-4(type="submit") Tarkista
+
+            if results
+                .mt-4
+                    h2 Tulos
+                    p #{results.message}
+                    if results.counts.length
+                        ul
+                            each item in results.counts
+                                li
+                                    b #{item.correctCount} oikein: #{item.count} kertaa
+                        ul
+                            each item in results.counts
+                                li
+                                    b #{item.correctCount} oikein: #{item.count} kertaa
+                                    if item.dates.length
+                                        ul
+                                            each date in item.dates
+                                                li #{date}
+
+// Add some styles for the number grid
+style.
+    .number-grid {
+        width: 40%;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        justify-content: center;
+    }
+    .number-box {
+        width: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .number-box input {
+        display: none;
+    }
+    .number-box label {
+        display: block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    .number-box input:checked + label {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+// Add a script to limit the selection to 7 numbers
+script.
+    function limitSelection(checkbox) {
+        const selectedCheckboxes = document.querySelectorAll('.number-box input:checked');
+        if (selectedCheckboxes.length > 7) {
+            checkbox.checked = false;
+        }
+    }
