@@ -32,37 +32,64 @@ app.use(
 // Routes
 // Regular user routes
 app.use('/', indexRouter);
+
+app.get('/', (req, res) => {
+    res.render('index', {
+        title: 'Lotto-peli',
+        results: null,
+        selectedNumbers: []
+    });
+});
+
 app.post('/check-numbers', (req, res) => {
-	const selectedNumbers = req.body.numbers.map(Number);
+    const selectedNumbers = req.body.numbers ? req.body.numbers.map(Number) : [];
 
-	const allResults = [...results2010to2024, ...results2000to2010, ...results1990to2000];
-	const matches = allResults
-		.map((result) => {
-			const correctCount = result.primaryNumbers.filter((num) => selectedNumbers.includes(num)).length;
-			return {...result, correctCount};
-		})
-		.filter((result) => result.correctCount > 0);
+    const allResults = [...results2010to2024, ...results2000to2010, ...results1990to2000];
+    const matches = allResults
+        .map((result) => {
+            const correctCount = result.primaryNumbers.filter((num) => selectedNumbers.includes(num)).length;
+            return { ...result, correctCount };
+        })
+        .filter((result) => result.correctCount > 0);
 
-	const counts = {};
-	const datesByCorrectCount = {};
+    const counts = {};
+    const datesByCorrectCount = {};
 
-	matches.forEach((match) => {
-		const cc = match.correctCount;
-		counts[cc] = (counts[cc] || 0) + 1;
-		datesByCorrectCount[cc] = datesByCorrectCount[cc] || [];
-		datesByCorrectCount[cc].push(match.date);
-	});
+    matches.forEach((match) => {
+        const cc = match.correctCount;
+        counts[cc] = (counts[cc] || 0) + 1;
+        datesByCorrectCount[cc] = datesByCorrectCount[cc] || [];
+        datesByCorrectCount[cc].push(match.date);
+    });
 
-	const countsArray = Object.keys(counts).map((correctCount) => ({
-		correctCount: Number(correctCount),
-		count: counts[correctCount],
-		dates: datesByCorrectCount[correctCount]
-	}));
+    const countsArray = Object.keys(counts).map((correctCount) => ({
+        correctCount: Number(correctCount),
+        count: counts[correctCount],
+        dates: datesByCorrectCount[correctCount]
+    }));
 
-	countsArray.sort((a, b) => b.correctCount - a.correctCount);
+    countsArray.sort((a, b) => b.correctCount - a.correctCount);
 
-	const message = matches.length > 0 ? 'Löytyi osumia!' : 'Ei osumia.';
-	res.render('index', {results: {message, counts: countsArray}});
+    const message = matches.length > 0 ? 'Löytyi osumia!' : 'Ei osumia.';
+    res.render('index', {
+        title: 'Lotto-peli',
+        results: { message, counts: countsArray },
+        selectedNumbers // Pass selectedNumbers to the template
+    });
+});
+
+// Endpoint to serve pie chart data
+app.post('/pie-chart-data', (req, res) => {
+    const selectedNumbers = Array.isArray(req.body.numbers) ? req.body.numbers.map(Number) : [];
+    const allResults = [...results2010to2024, ...results2000to2010, ...results1990to2000];
+    const counts = {};
+
+    allResults.forEach((result) => {
+        const correctCount = result.primaryNumbers.filter((num) => selectedNumbers.includes(num)).length;
+        counts[correctCount] = (counts[correctCount] || 0) + 1;
+    });
+
+    res.json(counts);
 });
 
 // 404 Error Handling
@@ -126,7 +153,7 @@ function readLottoFile(filePath) {
 const results2010to2024 = readLottoFile(path.join(__dirname, 'results 2010-2024.txt'));
 const results2000to2010 = readLottoFile(path.join(__dirname, 'results 2000-2010.txt'));
 const results1990to2000 = readLottoFile(path.join(__dirname, 'results 1990-2000.txt'));
-console.log(results2010to2024);
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;
