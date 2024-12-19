@@ -16,6 +16,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), {maxAge: 31557600000}));
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {maxAge: 31557600000}));
 
+// Serve Fireworks and Confetti libraries
+app.use('/js/lib/fireworks', express.static(path.join(__dirname, 'node_modules/fireworks-js/dist')));
+app.use('/js/lib/confetti', express.static(path.join(__dirname, 'node_modules/confetti-js/dist')));
+
 // Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -42,6 +46,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/check-numbers', (req, res) => {
+    let win = false;
     const selectedNumbers = req.body.numbers ? req.body.numbers.map(Number) : [];
 
     const allResults = [...results2010to2024, ...results2000to2010, ...results1990to2000];
@@ -71,8 +76,12 @@ app.post('/check-numbers', (req, res) => {
     countsArray.sort((a, b) => b.correctCount - a.correctCount);
 
     const message = matches.length > 0 ? 'Löytyi osumia!' : 'Ei osumia.';
+    if (countsArray.some(item => item.correctCount === 7)) {
+        win = true;
+    }
     res.render('index', {
         title: 'Lotto-peli',
+        win: win,
         results: { message, counts: countsArray },
         selectedNumbers // Pass selectedNumbers to the template
     });
@@ -91,6 +100,93 @@ app.post('/pie-chart-data', (req, res) => {
 
     res.json(counts);
 });
+
+// Modify the /stats route
+app.get('/stats', (req, res) => {
+    const allResults = [...results2010to2024, ...results2000to2010, ...results1990to2000];
+
+    // Calculate frequency of each number
+    const numberFrequency = {};
+    allResults.forEach(result => {
+        result.primaryNumbers.forEach(num => {
+            numberFrequency[num] = (numberFrequency[num] || 0) + 1;
+        });
+    });
+
+    // Calculate total number of draws
+    const totalDraws = allResults.length;
+
+    // Calculate percentage for each number
+    const numberFrequencyWithPercentage = {};
+    Object.keys(numberFrequency).forEach(num => {
+        const frequency = numberFrequency[num];
+        const percentage = ((frequency / (totalDraws * 7)) * 100).toFixed(2); // Assuming 7 numbers per draw
+        numberFrequencyWithPercentage[num] = {
+            num,
+            frequency,
+            percentage
+        };
+    });
+
+    // Calculate theoretical chances of winning
+    const totalCombinations = combination(40, 7); // Total possible combinations of 7 numbers out of 39
+    const chancesOfWinning = calculateChances();
+
+    // Calculate the most probable set of numbers (top 7 by frequency)
+    const sortedNumbers = Object.values(numberFrequencyWithPercentage).sort((a, b) => b.frequency - a.frequency);
+    const mostProbableSet = sortedNumbers.slice(0, 7).map(num => num.num);
+
+    // Check and collect all duplicate 7-number sets with their counts
+    const setCounts = {};
+    allResults.forEach(result => {
+        const sortedSet = result.primaryNumbers.slice().sort((a, b) => a - b).join(',');
+        setCounts[sortedSet] = (setCounts[sortedSet] || 0) + 1;
+    });
+
+    const duplicateSets = Object.entries(setCounts)
+        .filter(([set, count]) => count > 1)
+        .map(([set, count]) => ({
+            set: set.split(',').map(Number),
+            count
+        }));
+
+    // Pass data to the template
+    res.render('stats', {
+        title: 'Lotto-peli Tilastot',
+        numberFrequency: numberFrequencyWithPercentage,
+        totalDraws,
+        totalCombinations,
+        chancesOfWinning,
+        mostProbableSet,
+        hasDuplicateSets: duplicateSets.length > 0,
+        duplicateSets // Pass duplicateSets with counts to the template
+    });
+});
+
+// Add this route for /help
+app.get('/help', (req, res) => {
+    res.render('help', {
+        title: 'Lotto-peli Ohjeet'
+    });
+});
+
+// Function to calculate combinations
+function combination(n, k) {
+    let result = 1;
+    for(let i = 1; i <= k; i++) {
+        result = result * (n - i + 1) / i;
+    }
+    return result;
+}
+
+// Function to calculate chances of winning for different match counts
+function calculateChances() {
+    const chances = {};
+    for(let correct = 7; correct >= 1; correct--) {
+        chances[correct] = combination(7, correct) * combination(33, 7 - correct) / combination(40, 7);
+    }
+    return chances;
+}
 
 // 404 Error Handling
 app.use((req, res, next) => {

@@ -6,6 +6,7 @@ import datetime
 
 # Helper function to calculate the end date of an 11-week range
 target_end_date = datetime.date(1990, 1, 1)
+start_date = datetime.date(1980, 1, 1)
 def calculate_end_date(start_date):
     return start_date + datetime.timedelta(weeks=10)
 
@@ -171,7 +172,6 @@ def get_lotto(start_date, end_date, lotto_results, forward = True):
 
 # Process and save results
 lotto_results = []
-start_date = datetime.date(1980, 1, 1)
 end_date = calculate_end_date(start_date)
 forward = False
 while end_date < target_end_date:

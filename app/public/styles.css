@@ -1,0 +1,123 @@
+
+/* Background and Wrapper Styles */
+body {
+    background-image: url('download.jpg');
+    background-size: fill;
+    background-repeat: below;
+    background-position: top;
+}
+.content-wrapper {
+    width: 60%;
+    margin: 0 auto;
+    background-color: rgba(51, 42, 42, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Number Grid Styles */
+.number-grid {
+    width: 40%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    justify-content: center;
+}
+.number-box {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.number-box input {
+    display: none;
+}
+.number-box label {
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.number-box input:checked + label {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Results and Chart Styles */
+.results-container {
+    display: flex;
+    justify-content: space-between;
+}
+.results-list {
+    text-align: left;
+    width: 50%;
+}
+.pie-chart-container {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Button Styles */
+.fancy-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+.fancy-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+.fancy-button:active {
+    background-color: #004080;
+    transform: scale(0.95);
+}
+
+/* Pie Chart Styles */
+#pieChart {
+    max-height: 400px;
+    width: 100%;
+}
+#confetti-holder{
+    position: fixed;
+    z-index: 9999;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* Mobile-Friendly Styles */
+@media (max-width: 768px) {
+    .content-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+    }
+    .number-grid {
+        width: 100%;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+    }
+    .number-box {
+        width: auto;
+    }
+    .results-container {
+        flex-direction: column;
+    }
+    .results-list,
+    .pie-chart-container {
+        width: 100%;
+        margin-top: 20px;
+    }
+}

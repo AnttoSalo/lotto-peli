@@ -1,0 +1,18 @@
+{
+  "name": "lotto-peli",
+  "version": "1.0.0",
+  "description": "Lotto Peli Application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^3.0.2",
+    "body-parser": "^1.19.0",
+    "express-session": "^1.17.1"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

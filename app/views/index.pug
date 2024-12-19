@@ -1,77 +1,171 @@
+block head
+        title #{title}
+        link(rel="stylesheet", href="/styles.css")
 block content
-    .content-wrapper.w-50
-        .black-overlay
-            .content
+    include layout
+    .content-wrapper.text-center.mt-5
+        .black-overlay.text-center
+            .content.text-center
                 h1.display-4 Lotto-Peli
 
         .container.mt-8
-            .p Valitse numerosi
+            .p.mb-2 Valitse numerosi
             form(action="/check-numbers" method="post")
                 .number-grid
                     each num in [...Array(39).keys()].map(n => n + 1)
+                        - const isChecked = selectedNumbers && selectedNumbers.includes(num);
                         .number-box
-                            input(type="checkbox" id=`num${num}` name="numbers" value=`${num}` onchange="limitSelection(this)")
+                            input(
+                                type="checkbox",
+                                id=`num${num}`,
+                                name="numbers",
+                                value=`${num}`,
+                                onchange="limitSelection(this)",
+                                checked=isChecked
+                            )
                             label(for=`num${num}`) #{num}
-                button.btn.btn-primary.mt-4(type="submit") Tarkista
+                button.btn.btn-primary.mt-4.fancy-button(type="submit") Tarkista
 
             if results
-                .mt-4
-                    h2 Tulos
-                    p #{results.message}
-                    if results.counts.length
-                        ul
-                            each item in results.counts
-                                li
-                                    b #{item.correctCount} oikein: #{item.count} kertaa
-                        ul
-                            each item in results.counts
-                                li
-                                    b #{item.correctCount} oikein: #{item.count} kertaa
-                                    if item.dates.length
-                                        ul
-                                            each date in item.dates
-                                                li #{date}
+                .mt-4.results-container
+                    span.results-list
+                        h2 Tulos
+                        p #{results.message}
+                        if results.counts.length
+                            ul
+                                each item in results.counts
+                                    li
+                                        b #{item.correctCount} oikein: #{item.count} kertaa
+                            button.btn.btn-secondary.mt-2.fancy-button(type="button", id="toggleDatesButton") Näytä päivämäärät 
+                            ul#datesList
+                                each item in results.counts
+                                    li
+                                        b #{item.correctCount} oikein: #{item.count} kertaa
+                                        if item.dates.length
+                                            ul
+                                                each date in item.dates
+                                                    li #{date}
+                    span.pie-chart-container
+                        canvas#pieChart
 
-// Add some styles for the number grid
-style.
-    .number-grid {
-        width: 40%;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-        justify-content: center;
-    }
-    .number-box {
-        width: 50px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .number-box input {
-        display: none;
-    }
-    .number-box label {
-        display: block;
-        width: 40px;
-        height: 40px;
-        line-height: 40px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-    .number-box input:checked + label {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
+    // Fireworks and Confetti
+    canvas#fireworks-container
+    canvas#confetti-holder
 
-// Add a script to limit the selection to 7 numbers
-script.
-    function limitSelection(checkbox) {
-        const selectedCheckboxes = document.querySelectorAll('.number-box input:checked');
-        if (selectedCheckboxes.length > 7) {
-            checkbox.checked = false;
+    // Winning Modal
+    .modal.fade#winningModal(tabindex='-1', role='dialog')
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header
+                    h5.modal-title Voitit!
+                    button.btn-close#modalCloseBtn(type='button', data-bs-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') &times;
+                .modal-body
+                    p Onneksi olkoon! Arvasit kaikki 7 numeroa oikein!
+block scripts
+    // Include the Fireworks and Confetti libraries from local paths
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js", crossorigin="anonymous")
+    script(src="/js/lib/fireworks/index.umd.js")
+    script(src="/js/lib/confetti/index.min.js")
+    script(src="https://cdn.jsdelivr.net/npm/chart.js")
+    script(src="https://code.jquery.com/jquery-3.7.1.min.js", integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=", crossorigin="anonymous")
+    script(src="/js/scripts.js")
+    script.
+        let datesVisible = false;
+        
+        function limitSelection(checkbox) {
+            const selectedCheckboxes = document.querySelectorAll('.number-box input:checked');
+            if (selectedCheckboxes.length > 7) {
+                checkbox.checked = false;
+            }
         }
-    }
+
+        let pieChartInstance;
+
+        function fetchPieChartData() {
+            const selectedNumbers = Array.from(document.querySelectorAll('.number-box input:checked')).map(cb => cb.value);
+            fetch('/pie-chart-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ numbers: selectedNumbers })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const pieChartElement = document.getElementById('pieChart');
+                if (pieChartElement) {
+                    const ctx = pieChartElement.getContext('2d');
+                    if (pieChartInstance) {
+                        pieChartInstance.destroy();
+                    }
+                    pieChartInstance = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data).map(key => `${key} oikein`),
+                            datasets: [{
+                                data: Object.values(data),
+                                backgroundColor: [
+                                    '#FF6384',
+                                    '#36A2EB',
+                                    '#FFCE56',
+                                    '#4BC0C0',
+                                    '#9966FF',
+                                    '#FF9F40',
+                                    '#8A2BE2',
+                                    '#FF7F50'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.number-box input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    limitSelection(cb);
+                });
+            });
+
+            if (typeof hasResults !== 'undefined' && hasResults) {
+                fetchPieChartData();
+            }
+
+            const datesList = document.getElementById('datesList');
+            if (datesList) {
+                datesList.style.display = 'none';
+            }
+
+            document.getElementById('toggleDatesButton').addEventListener('click', function() {
+                if (datesList.style.display === 'none' || datesList.style.display === '') {
+                    datesList.style.display = 'block';
+                    this.textContent = 'Piilota päivämäärät';
+                } else {
+                    datesList.style.display = 'none';
+                    this.textContent = 'Näytä päivämäärät';
+                }
+            });
+
+            // Check if the user won
+            if (typeof win !== 'undefined' && win) {
+                showFireworksAndConfetti();
+            }
+        });
+
+    // Pass variables to the client
+    script.
+        var hasResults = #{results ? 'true' : 'false'};
+        var win = #{win ? 'true' : 'false'};
+        var results = !{JSON.stringify(results)};

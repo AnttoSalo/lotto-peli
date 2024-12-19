@@ -1,0 +1,116 @@
+block content
+    include layout
+    .content-wrapper.text-center.text-white
+        h1 #{title}
+        p Yhteensä arvontoja: #{totalDraws} (1990-2024)
+        h2 Voiton todennäköisyydet
+        table.table.table-bordered.text-white
+            thead
+                tr
+                    th Oikein
+                    th Todennäköisyys
+            tbody
+                each correct in Object.keys(chancesOfWinning).sort((a, b) => b - a)
+                    tr
+                        td #{correct}
+                        td 1 / #{Math.round(1 / chancesOfWinning[correct]).toLocaleString('fi-FI')}
+
+        h2 Useimmiten esiintyvät yksittäiset numerot: 
+        .div.balls.mb-4.mt-0
+            each number in mostProbableSet
+                .ball(style="background-color: orange; border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
+                    strong(style="color: black;") #{number}
+
+        if hasDuplicateSets
+            h2 Toistuvat numeroiden setit:
+            p Kaikki numerosarjat, jotka on arvottu useamman kerran
+            table.table.table-bordered.text-white
+                thead
+                    tr
+                        th Setti
+                        th Arvonnat
+                tbody
+                    each dup in duplicateSets
+                        tr
+                            td
+                                each number in dup.set 
+                                    .ball(style="background-color: orange; border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
+                                        strong(style="color: black;") #{number}
+                            td #{dup.count}
+        else
+            p.text-warning Ei ole olemassa settiä, jossa sama 7 numeroa on arvottu useammin kuin kerran.
+        h2 Numeron esiintymistiheydet
+        p Numero 40 on ollut käytössä vasta vuodesta 2016 lähtien. Se oli myös käytössä ennen vuotta 1980.
+        table.table.table-bordered.text-white
+            thead
+                tr
+                    th Numerot
+                        button.btn.btn-secondary#sortNum(data-sort-order='asc')
+                            i.fa.fa-sort-amount-asc
+                    th Esiintymistiheys
+                        button.btn.btn-secondary#sortFrequency(data-sort-order='desc')
+                            i.fa.fa-sort-amount-desc                        
+                    th Prosenttiosuus
+            tbody#frequencyTableBody
+                each num in numberFrequency
+                    tr
+                        td #{num.num}
+                        td #{num.frequency}
+                        td #{num.percentage}%
+
+                        
+block scripts
+    // ...existing scripts...
+    script.
+        document.getElementById('sortNum').addEventListener('click', function() {
+            toggleSort(this, 'num');
+        });
+
+        document.getElementById('sortFrequency').addEventListener('click', function() {
+            toggleSort(this, 'frequency');
+        });
+
+        function toggleSort(button, criteria) {
+            const currentOrder = button.getAttribute('data-sort-order');
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            button.setAttribute('data-sort-order', newOrder);
+            const icon = button.querySelector('i');
+
+            // Update icon classes
+            if (newOrder === 'asc') {
+                icon.classList.remove('fa-sort-amount-desc');
+                icon.classList.add('fa-sort-amount-asc');
+            } else {
+                icon.classList.remove('fa-sort-amount-asc');
+                icon.classList.add('fa-sort-amount-desc');
+            }
+
+            sortTable(criteria, newOrder);
+        }
+
+        function sortTable(criteria, order) {
+            const tableBody = document.getElementById('frequencyTableBody');
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                if (criteria === 'num') {
+                    aValue = Number(a.querySelector('td:nth-child(1)').textContent);
+                    bValue = Number(b.querySelector('td:nth-child(1)').textContent);
+                } else if (criteria === 'frequency') {
+                    aValue = Number(a.querySelector('td:nth-child(2)').textContent);
+                    bValue = Number(b.querySelector('td:nth-child(2)').textContent);
+                }
+
+                if (order === 'asc') {
+                    return aValue - bValue;
+                } else {
+                    return bValue - aValue;
+                }
+            });
+
+            // Append sorted rows back to the table body
+            rows.forEach(row => tableBody.appendChild(row));
+        }
+    // ...existing scripts...
