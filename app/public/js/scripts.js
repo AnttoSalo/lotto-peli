@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (datesList) {
         datesList.style.display = 'none';
     }
-
+    if (document.getElementById('toggleDatesButton')) {
     document.getElementById('toggleDatesButton').addEventListener('click', function() {
         if (datesList.style.display === 'none' || datesList.style.display === '') {
             datesList.style.display = 'block';
@@ -25,21 +25,22 @@ document.addEventListener('DOMContentLoaded', function() {
             this.textContent = 'Näytä päivämäärät';
         }
     });
-
+    }
     // Win condition
-    if (
-        typeof results !== 'undefined' &&
-        results.counts &&
-        results.counts.some(item => item.correctCount === 7)
-    ) {
-        showFireworksAndConfetti();
-    }
+    if ( results ){
+        if (
+            typeof results !== 'undefined' &&
+            results.counts &&
+            results.counts.some(item => item.correctCount === 7)
+        ) {
+            showFireworksAndConfetti();
+        }
 
-    // Check if the user won
-    if (typeof win !== 'undefined' && win) {
-        showFireworksAndConfetti();
-    }
-});
+        // Check if the user won
+        if (typeof win !== 'undefined' && win) {
+            showFireworksAndConfetti();
+        }
+}});
 
 function limitSelection(checkbox) {
     const selectedCheckboxes = document.querySelectorAll('.number-box input:checked');

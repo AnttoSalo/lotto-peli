@@ -13,7 +13,7 @@ app.set('view engine', 'pug');
 // Middleware to serve static files
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), {maxAge: 31557600000}));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), {maxAge: 31557600000}));
+// app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), {maxAge: 31557600000}));
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), {maxAge: 31557600000}));
 
 // Serve Fireworks and Confetti libraries, do not update these modules, will break the app

@@ -1,10 +1,14 @@
+block head
+    link(rel='stylesheet', href='/styles.css')
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 block content
     include layout
     .content-wrapper.text-center.text-white
         h1 #{title}
         p Yhteensä arvontoja: #{totalDraws} (1990-2024)
         h2 Voiton todennäköisyydet
-        table.table.table-bordered.text-white
+        table.table.table-bordered.text-white.table-primary.table-dark
             thead
                 tr
                     th Oikein
@@ -18,13 +22,13 @@ block content
         h2 Useimmiten esiintyvät yksittäiset numerot: 
         .div.balls.mb-4.mt-0
             each number in mostProbableSet
-                .ball(style="background-color: orange; border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
+                .ball(style="background-color: orange; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
                     strong(style="color: black;") #{number}
 
         if hasDuplicateSets
             h2 Toistuvat numeroiden setit:
             p Kaikki numerosarjat, jotka on arvottu useamman kerran
-            table.table.table-bordered.text-white
+            table.table.table-bordered.text-white.table-dark
                 thead
                     tr
                         th Setti
@@ -34,14 +38,14 @@ block content
                         tr
                             td
                                 each number in dup.set 
-                                    .ball(style="background-color: orange; border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
+                                    .ball(style="background-color: orange; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 5px;")
                                         strong(style="color: black;") #{number}
                             td #{dup.count}
         else
             p.text-warning Ei ole olemassa settiä, jossa sama 7 numeroa on arvottu useammin kuin kerran.
         h2 Numeron esiintymistiheydet
-        p Numero 40 on ollut käytössä vasta vuodesta 2016 lähtien. Se oli myös käytössä ennen vuotta 1980.
-        table.table.table-bordered.text-white
+        p Numero 40 on ollut käytössä vasta vuodesta 2016 lähtien.
+        table.table.table-bordered.text-white.table-dark
             thead
                 tr
                     th Numerot
@@ -58,7 +62,7 @@ block content
                         td #{num.frequency}
                         td #{num.percentage}%
 
-                        
+
 block scripts
     // ...existing scripts...
     script.

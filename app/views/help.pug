@@ -1,14 +1,20 @@
-extends layout
+block head 
+    title= title
+    link(rel="stylesheet", href="/styles.css")
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 
 block content
-    .content-wrapper.text-center.text-white.mt-5.fit-content.opacity-100
+    include layout
+    .content-wrapper.text-white.text-left
         style.
             ul {
                 list-style-position: inside;
             }
-        h1 #{title}
+        div.text-center
+            h1 #{title}
         p Tervetuloa Lotto-peliin! Tavoitteena on arvata oikein 7 numeroa 39 numerosta. 
-        p Numero 40 ei ole valittavissa, sillä se on ollut käytössä vasta 2016 lähtien.
+        p Numero 40 ei ole valittavissa, sillä se on ollut käytössä vasta 2016 lähtien. Se oli käytössä myös ennen vuotta 1980.
         p Peli vertaa valitsemiasi numeroita vanhoihin Veikkauksen lottonumeroihin vuosilta 1990-2024. 
         p Tietokannassa on yhteensä 1809 arvontaa.
         p Näinkin monella arvonnalla mahdollisuus arvata kaikki 7 numeroa on noin   1/8 500
