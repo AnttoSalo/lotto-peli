@@ -105,9 +105,9 @@ body {
         padding: 10px;
     }
     .number-grid {
-        width: 100%;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 5px;
+        width: 80%;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1px;
     }
     .number-box {
         width: auto;

@@ -1,10 +1,10 @@
-
-block content
-    .content-wrapper
-        .black-overlay
-            .content.text-orange
-                .row.justify-content-center
-                    .col-md-8
-                        h1 Sivua ei löydy
-                        p Anteeksi, mutta etsimääsi sivua ei löytynyt.
-                        a.btn.btn-primary.mt-3(href='/') Takaisin etusivulle
+doctype html
+html
+    head
+        title #{title}
+        link(rel="stylesheet", href="/styles.css")
+    body
+        .container
+            h1 404 - Sivua ei löydy
+            p Valitettavasti etsimääsi sivua ei löytynyt.
+            a(href="/") Palaa etusivulle

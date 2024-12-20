@@ -1,6 +1,7 @@
 block head
-        title #{title}
-        link(rel="stylesheet", href="/styles.css")
+    title #{title}
+    link(rel="stylesheet", href="/styles.css")
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 block content
     include layout
     .content-wrapper.text-center.mt-5
@@ -63,108 +64,12 @@ block content
                 .modal-body
                     p Onneksi olkoon! Arvasit kaikki 7 numeroa oikein!
 block scripts
-    // Include the Fireworks and Confetti libraries from local paths
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js", crossorigin="anonymous")
-    script(src="/js/lib/fireworks/index.umd.js")
-    script(src="/js/lib/confetti/index.min.js")
     script(src="https://cdn.jsdelivr.net/npm/chart.js")
     script(src="https://code.jquery.com/jquery-3.7.1.min.js", integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=", crossorigin="anonymous")
+    script(src="/js/lib/fireworks/index.umd.js")
+    script(src="/js/lib/confetti/index.min.js")
     script(src="/js/scripts.js")
-    script.
-        let datesVisible = false;
-        
-        function limitSelection(checkbox) {
-            const selectedCheckboxes = document.querySelectorAll('.number-box input:checked');
-            if (selectedCheckboxes.length > 7) {
-                checkbox.checked = false;
-            }
-        }
-
-        let pieChartInstance;
-
-        function fetchPieChartData() {
-            const selectedNumbers = Array.from(document.querySelectorAll('.number-box input:checked')).map(cb => cb.value);
-            fetch('/pie-chart-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ numbers: selectedNumbers })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const pieChartElement = document.getElementById('pieChart');
-                if (pieChartElement) {
-                    const ctx = pieChartElement.getContext('2d');
-                    if (pieChartInstance) {
-                        pieChartInstance.destroy();
-                    }
-                    pieChartInstance = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: Object.keys(data).map(key => `${key} oikein`),
-                            datasets: [{
-                                data: Object.values(data),
-                                backgroundColor: [
-                                    '#FF6384',
-                                    '#36A2EB',
-                                    '#FFCE56',
-                                    '#4BC0C0',
-                                    '#9966FF',
-                                    '#FF9F40',
-                                    '#8A2BE2',
-                                    '#FF7F50'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom'
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkboxes = document.querySelectorAll('.number-box input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', () => {
-                    limitSelection(cb);
-                });
-            });
-
-            if (typeof hasResults !== 'undefined' && hasResults) {
-                fetchPieChartData();
-            }
-
-            const datesList = document.getElementById('datesList');
-            if (datesList) {
-                datesList.style.display = 'none';
-            }
-
-            document.getElementById('toggleDatesButton').addEventListener('click', function() {
-                if (datesList.style.display === 'none' || datesList.style.display === '') {
-                    datesList.style.display = 'block';
-                    this.textContent = 'Piilota päivämäärät';
-                } else {
-                    datesList.style.display = 'none';
-                    this.textContent = 'Näytä päivämäärät';
-                }
-            });
-
-            // Check if the user won
-            if (typeof win !== 'undefined' && win) {
-                showFireworksAndConfetti();
-            }
-        });
-
-    // Pass variables to the client
     script.
         var hasResults = #{results ? 'true' : 'false'};
         var win = #{win ? 'true' : 'false'};
